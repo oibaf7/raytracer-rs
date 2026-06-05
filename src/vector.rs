@@ -1,7 +1,7 @@
 use std::{fmt, ops};
 use std::fmt::Formatter;
 
-#[derive(Default)]
+#[derive(Default, Copy, Clone)]
 pub struct Vec3 {
     x: f64,
     y: f64,
@@ -17,31 +17,31 @@ impl Vec3 {
         }
     }
 
-    pub fn get_x(&self) -> f64 {
+    pub fn x(&self) -> f64 {
         self.x
     }
 
-    pub fn get_y(&self) -> f64 {
+    pub fn y(&self) -> f64 {
         self.y
     }
 
-    pub fn get_z(&self) -> f64 {
+    pub fn z(&self) -> f64 {
         self.z
     }
 
-    pub fn get_length_squared(&self) -> f64 {
+    pub fn length_squared(&self) -> f64 {
          self.x * self.x + self.y * self.y + self.z * self.z
     }
 
-    pub fn get_length(&self) -> f64 {
-        self.get_length_squared().sqrt()
+    pub fn length(&self) -> f64 {
+        self.length_squared().sqrt()
     }
 
-    pub fn dot(&self, rhs: &Vec3) -> f64 {
+    pub fn dot(&self, rhs: Vec3) -> f64 {
         self.x * rhs.x + self.y * rhs.y + self.z * rhs.z
     }
 
-    pub fn cross(&self, rhs: &Vec3) -> Self {
+    pub fn cross(&self, rhs: Vec3) -> Self {
         Self {
             x: self.y * rhs.x - self.z * rhs.y,
             y: self.z * rhs.x - self.x * rhs.z,
@@ -50,7 +50,7 @@ impl Vec3 {
     }
 
     pub fn unit_vector(&self) -> Vec3 {
-        let len = self.get_length();
+        let len = self.length();
         Vec3 {
             x: self.x / len,
             y: self.y / len,
@@ -144,17 +144,17 @@ impl ops::MulAssign<f64> for Vec3 {
 }
 
 pub struct Color(Vec3);
-pub struct Point3(Vec3);
 
 impl Color {
     pub fn new(x: f64, y: f64, z: f64) -> Self {
         Self(Vec3::new(x, y, z))
     }
-}
-
-impl Point3 {
-    pub fn new(x: f64, y: f64, z: f64) -> Self {
-        Self(Vec3::new(x, y, z))
+    pub fn from_vec(vec: Vec3) -> Self{
+        Self(vec)
+    }
+    
+    pub fn vec(&self) -> Vec3 {
+        self.0
     }
 }
 
