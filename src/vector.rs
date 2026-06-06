@@ -1,5 +1,4 @@
 use std::{fmt, ops};
-use std::fmt::Formatter;
 
 #[derive(Default, Copy, Clone)]
 pub struct Vec3 {
@@ -10,11 +9,7 @@ pub struct Vec3 {
 
 impl Vec3 {
     pub fn new(x: f64, y: f64, z: f64) -> Self {
-        Self {
-            x,
-            y,
-            z,
-        }
+        Self { x, y, z }
     }
 
     pub fn x(&self) -> f64 {
@@ -30,7 +25,7 @@ impl Vec3 {
     }
 
     pub fn length_squared(&self) -> f64 {
-         self.x * self.x + self.y * self.y + self.z * self.z
+        self.x * self.x + self.y * self.y + self.z * self.z
     }
 
     pub fn length(&self) -> f64 {
@@ -57,8 +52,6 @@ impl Vec3 {
             z: self.z / len,
         }
     }
-
-
 }
 
 impl fmt::Display for Vec3 {
@@ -149,10 +142,10 @@ impl Color {
     pub fn new(x: f64, y: f64, z: f64) -> Self {
         Self(Vec3::new(x, y, z))
     }
-    pub fn from_vec(vec: Vec3) -> Self{
+    pub fn from_vec(vec: Vec3) -> Self {
         Self(vec)
     }
-    
+
     pub fn vec(&self) -> Vec3 {
         self.0
     }
@@ -160,6 +153,12 @@ impl Color {
 
 impl fmt::Display for Color {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(f, "{} {} {}\n", (self.0.x * 255.999) as u8, (self.0.y * 255.999) as u8, (self.0.z * 255.999) as u8)
+        write!(
+            f,
+            "{} {} {}\n",
+            (self.0.x * 255.999) as u8,
+            (self.0.y * 255.999) as u8,
+            (self.0.z * 255.999) as u8
+        )
     }
 }

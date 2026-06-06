@@ -1,10 +1,11 @@
 use raytracer_rs::hittable::HittableList;
+use raytracer_rs::interval::Interval;
 use raytracer_rs::sphere::Sphere;
 use raytracer_rs::vector::{Color, Vec3};
 use raytracer_rs::ray::Ray;
 
 fn ray_color(ray: &Ray, list: &HittableList) -> Color {
-    if let Some(rec) = list.hit(ray, 0.0, f64::INFINITY) {
+    if let Some(rec) = list.hit(ray, &Interval::new(0.0, f64::INFINITY)) {
         return Color::from_vec((rec.normal() + Vec3::new(1.0, 1.0, 1.0)) * 0.5);
     }
     let unit_direction = ray.dir().unit_vector();

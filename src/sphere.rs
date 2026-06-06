@@ -1,24 +1,21 @@
-use std::path::StripPrefixError;
-use crate::vector::Vec3;
 use crate::hittable::{HitRecord, Hittable};
+use crate::interval::Interval;
 use crate::ray::Ray;
+use crate::vector::Vec3;
 
 pub struct Sphere {
     center: Vec3,
-    radius: f64
+    radius: f64,
 }
 
 impl Sphere {
     pub fn new(center: Vec3, radius: f64) -> Self {
-        Self {
-            center,
-            radius,
-        }
+        Self { center, radius }
     }
 }
 
 impl Hittable for Sphere {
-    fn hit(&self, ray: &Ray, t_min: f64, t_max: f64) -> Option<HitRecord>{
+    fn hit(&self, ray: &Ray, interval: &Interval) -> Option<HitRecord> {
         let oc = self.center - ray.origin();
         let a = ray.dir().dot(ray.dir());
         let h = ray.dir().dot(oc);
@@ -30,13 +27,12 @@ impl Hittable for Sphere {
 
         let sqrt = discriminant.sqrt();
         let mut root = (h - sqrt) / a;
-        if(root <= t_min || root >= t_max) {
+        if !interval.surrounds(root) {
             root = (h + sqrt) / a;
-            if(root <= t_min || root >= t_max) {
+            if !interval.surrounds(root) {
                 return None;
             }
         }
-
 
         let p = ray.at(root);
         let outward_normal = (p - self.center) * (1.0 / self.radius);
