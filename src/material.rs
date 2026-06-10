@@ -1,6 +1,6 @@
 use std::sync::mpsc::Receiver;
 use std::thread::scope;
-
+use rand::random;
 use crate::hittable::HitRecord;
 use crate::ray::Ray;
 use crate::vector::{Color, Vec3};
@@ -65,6 +65,12 @@ impl Dielectric {
     pub fn new(refractive_index: f64) -> Self {
         Self { refractive_index }
     }
+
+    fn reflectance(cos: f64, index: f64) -> f64 {
+        let mut r0 =  (1.0 - index) / (1.0 + index);
+        r0 *= r0;
+        r0 + (1.0 - r0) * f64::powf((1.0 - cos), 5.0)
+    }
 }
 
 impl Material for Dielectric {
@@ -81,7 +87,7 @@ impl Material for Dielectric {
         let sin = (1.0 - cos * cos).sqrt();
 
         let cannot_refract = ri * sin > 1.0;
-        let direction = if cannot_refract {
+        let direction = if cannot_refract || Self::reflectance(cos, ri) > random::<f64>() {
             Vec3::reflect(unit_direction, rec.normal)
         } else {
             Vec3::refract(unit_direction, rec.normal, ri)

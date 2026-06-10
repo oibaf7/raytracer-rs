@@ -1,9 +1,10 @@
 use crate::interval::Interval;
 use crate::utility::random_double;
-use rand::Rng;
+use rand::{random};
 use std::{fmt, ops};
+use rand::Rng;
 
-#[derive(Default, Copy, Clone)]
+#[derive(Default, Copy, Clone, Debug)]
 pub struct Vec3 {
     x: f64,
     y: f64,
@@ -58,9 +59,9 @@ impl Vec3 {
 
     fn random_vector() -> Self {
         Vec3 {
-            x: rand::thread_rng().r#gen::<f64>(),
-            y: rand::thread_rng().r#gen::<f64>(),
-            z: rand::thread_rng().r#gen::<f64>(),
+            x: random::<f64>(),
+            y: random::<f64>(),
+            z: random::<f64>(),
         }
     }
 
@@ -106,6 +107,15 @@ impl Vec3 {
         let r_out_parallel = n * f64::abs(1.0 - r_out_perp.length_squared()).sqrt() * -1.0;
 
         r_out_perp + r_out_parallel
+    }
+
+    pub fn random_in_unit_disk() -> Vec3 {
+        loop {
+            let p = Vec3::new(random::<f64>() * 2.0 - 1.0, random::<f64>() * 2.0 - 1.0, 0.0);
+            if p.length_squared() < 1.0 {
+                return p;
+            }
+        }
     }
 }
 
