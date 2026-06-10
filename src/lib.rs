@@ -1,5 +1,8 @@
-pub mod vector;
-pub mod ray;
+pub mod camera;
 pub mod hittable;
-pub mod sphere;
 pub mod interval;
+pub mod material;
+pub mod ray;
+pub mod sphere;
+pub mod utility;
+pub mod vector;

@@ -1,4 +1,4 @@
-use crate::vector::{Vec3};
+use crate::vector::Vec3;
 
 pub struct Ray {
     origin: Vec3,
@@ -7,10 +7,7 @@ pub struct Ray {
 
 impl Ray {
     pub fn new(origin: Vec3, dir: Vec3) -> Self {
-        Self {
-            origin,
-            dir,
-        }
+        Self { origin, dir }
     }
 
     pub fn at(&self, t: f64) -> Vec3 {

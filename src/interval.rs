@@ -1,14 +1,11 @@
 pub struct Interval {
     min: f64,
-    max: f64
+    max: f64,
 }
 
 impl Interval {
     pub fn new(min: f64, max: f64) -> Self {
-        Self {
-            min,
-            max,
-        }
+        Self { min, max }
     }
 
     pub fn size(&self) -> f64 {
@@ -30,13 +27,23 @@ impl Interval {
     pub fn max(&self) -> f64 {
         self.max
     }
+
+    pub fn clamp(&self, t: f64) -> f64 {
+        if t < self.min {
+            return self.min;
+        } else if t > self.max {
+            return self.max;
+        }
+
+        t
+    }
 }
 
 impl Default for Interval {
     fn default() -> Self {
         Self {
             min: f64::NEG_INFINITY,
-            max: f64::INFINITY
+            max: f64::INFINITY,
         }
     }
 }
