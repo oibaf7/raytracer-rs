@@ -1,11 +1,11 @@
-use std::sync::mpsc::Receiver;
-use std::thread::scope;
-use rand::random;
 use crate::hittable::HitRecord;
 use crate::ray::Ray;
 use crate::vector::{Color, Vec3};
+use rand::random;
+use std::sync::mpsc::Receiver;
+use std::thread::scope;
 
-pub trait Material {
+pub trait Material: Send + Sync {
     fn scatter(&self, ray_in: &Ray, rec: &HitRecord) -> Option<(Color, Ray)>;
 }
 
@@ -67,7 +67,7 @@ impl Dielectric {
     }
 
     fn reflectance(cos: f64, index: f64) -> f64 {
-        let mut r0 =  (1.0 - index) / (1.0 + index);
+        let mut r0 = (1.0 - index) / (1.0 + index);
         r0 *= r0;
         r0 + (1.0 - r0) * f64::powf((1.0 - cos), 5.0)
     }

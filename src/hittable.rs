@@ -3,17 +3,18 @@ use crate::material::Material;
 use crate::ray::Ray;
 use crate::vector::Vec3;
 use std::rc::Rc;
+use std::sync::Arc;
 
 pub struct HitRecord {
     pub p: Vec3,
     pub normal: Vec3,
     pub t: f64,
     pub front_face: bool,
-    pub mat: Rc<dyn Material>,
+    pub mat: Arc<dyn Material>,
 }
 
 impl HitRecord {
-    pub fn new(p: Vec3, normal: Vec3, t: f64, mat: Rc<dyn Material>) -> Self {
+    pub fn new(p: Vec3, normal: Vec3, t: f64, mat: Arc<dyn Material>) -> Self {
         Self {
             p,
             normal,
@@ -32,7 +33,7 @@ impl HitRecord {
     }
 }
 
-pub trait Hittable {
+pub trait Hittable: Send + Sync {
     fn hit(&self, ray: &Ray, interval: &Interval) -> Option<HitRecord>;
 }
 

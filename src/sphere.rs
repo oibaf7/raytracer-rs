@@ -4,15 +4,16 @@ use crate::material::Material;
 use crate::ray::Ray;
 use crate::vector::Vec3;
 use std::rc::Rc;
+use std::sync::Arc;
 
 pub struct Sphere {
     center: Vec3,
     radius: f64,
-    mat: Rc<dyn Material>,
+    mat: Arc<dyn Material>,
 }
 
 impl Sphere {
-    pub fn new(center: Vec3, radius: f64, mat: Rc<dyn Material>) -> Self {
+    pub fn new(center: Vec3, radius: f64, mat: Arc<dyn Material>) -> Self {
         Self {
             center,
             radius,
@@ -43,7 +44,7 @@ impl Hittable for Sphere {
 
         let p = ray.at(root);
         let outward_normal = (p - self.center) * (1.0 / self.radius);
-        let mut rec = HitRecord::new(p, outward_normal, root, Rc::clone(&self.mat));
+        let mut rec = HitRecord::new(p, outward_normal, root, Arc::clone(&self.mat));
         rec.set_face_normal(ray, outward_normal);
 
         Some(rec)
