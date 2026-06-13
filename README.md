@@ -70,11 +70,20 @@ Three scenes of increasing complexity. Large scene: ~1600 spheres, 1200px wide, 
 | Parallel only | ~6.8× | ~7.5× | ~6.4× |
 | Parallel + BVH | ~5.5× | ~25.1× | ~64.2× |
 
+## Graphs
+
+<img width="1200" height="750" alt="image" src="https://github.com/user-attachments/assets/67ca4348-5d5b-4137-b933-be7df89c948e" />
+<img width="1200" height="750" alt="image" src="https://github.com/user-attachments/assets/343891e1-2b18-422c-aebb-d800875c8226" />
+<img width="900" height="600" alt="image" src="https://github.com/user-attachments/assets/92f23a4f-be8d-4e2c-95b7-ef64a3010f06" />
+
+## Large Scene
+<img width="1074" height="606" alt="image" src="https://github.com/user-attachments/assets/35125a7f-efc1-4add-8f66-96a28d7b96a2" />
+
 ## Building
 
 ```bash
-cargo build --release
-cargo run --release
+cargo build --release > output.ppm
+cargo run --release > > output.ppm
 ```
 
 ## Citations
