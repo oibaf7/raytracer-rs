@@ -1,8 +1,10 @@
+pub mod aabb;
+pub mod bvh;
 pub mod camera;
 pub mod hittable;
 pub mod interval;
 pub mod material;
-mod min_heap;
+pub mod min_heap;
 pub mod ray;
 pub mod sphere;
 pub mod thread_pool;

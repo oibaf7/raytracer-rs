@@ -7,7 +7,7 @@ use std::sync::Arc;
 use std::sync::atomic::{AtomicUsize, Ordering};
 use std::sync::mpsc::Sender;
 use std::thread;
-use std::thread::{available_parallelism, JoinHandle, Thread};
+use std::thread::{JoinHandle, Thread, available_parallelism};
 
 type Job = Box<dyn FnOnce() + Send + 'static>;
 
@@ -70,15 +70,12 @@ impl ThreadPool {
             workers.push(worker);
         }
 
-        Self {
-            workers,
-        }
+        Self { workers }
     }
 }
 
 impl Drop for ThreadPool {
     fn drop(&mut self) {
-
         for worker in self.workers.drain(..) {
             worker.handle.join().unwrap();
         }

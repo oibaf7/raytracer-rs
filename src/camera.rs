@@ -1,19 +1,19 @@
-use std::arch::x86_64::_mm256_sm4rnds4_epi32;
 use crate::hittable::{HitRecord, HittableList};
 use crate::interval::Interval;
+use crate::min_heap::Heap;
 use crate::ray::Ray;
+use crate::thread_pool::ThreadPool;
 use crate::tiles::Tile;
 use crate::vector::{Color, Vec3};
-use rand::Rng;
-use std::sync::{mpsc, Arc};
-use crate::min_heap::Heap;
-use crate::thread_pool::ThreadPool;
+use rand::{Rng, random};
+use std::arch::x86_64::_mm256_sm4rnds4_epi32;
+use std::sync::{Arc, mpsc};
 
 const ASPECT_RATIO: f64 = 16.0 / 9.0;
 const IMAGE_WIDTH: usize = 400usize;
 const SAMPLES_PER_PIXELS: usize = 100;
 const MAX_DEPTH: usize = 20;
-const CHUNK_SIZE: usize = 3; //thickness of chunk that goes across all x
+const CHUNK_SIZE: usize = 3;
 
 pub struct CameraParams {
     pub image_width: usize,
@@ -28,10 +28,6 @@ pub struct CameraParams {
     pub vfov: f64,
     pub lookfrom: Vec3,
     pub lookat: Vec3,
-    pub vup: Vec3,
-    u: Vec3,
-    v: Vec3,
-    w: Vec3,
     pub defocus_angle: f64,
     pub focus_dist: f64,
     pub defocus_disk_u: Vec3,
@@ -74,7 +70,6 @@ impl Camera {
         for y in 0..chunks_in_y {
             tiles.push(Tile::new(id, y));
             id += 1;
-
         }
         let (tx, rx) = mpsc::channel();
         ThreadPool::new(tx, tiles, params, list);
@@ -94,10 +89,8 @@ impl Camera {
                 }
             }
         }
-
     }
 
-    //move out later! and fix for refactor
     fn initialize(&mut self) -> CameraParams {
         self.aspect_ratio = ASPECT_RATIO;
         self.image_height = (self.image_width as f64 / self.aspect_ratio) as usize;
@@ -141,10 +134,6 @@ impl Camera {
             vfov: self.vfov,
             lookfrom: self.lookfrom,
             lookat: self.lookat,
-            vup: self.vup,
-            u: self.u,
-            v: self.v,
-            w: self.w,
             defocus_angle: self.defocus_angle,
             focus_dist: self.focus_dist,
             defocus_disk_u: self.defocus_disk_u,
@@ -157,7 +146,7 @@ impl Camera {
             return Vec3::new(0.0, 0.0, 0.0);
         }
 
-        if let Some(mut rec) = list.hit(ray, &Interval::new(0.001, f64::INFINITY)) {
+        if let Some(mut rec) = list.hit(ray, Interval::new(0.001, f64::INFINITY)) {
             if let Some(t) = rec.mat.scatter(ray, &rec) {
                 return t.0.vec() * Self::ray_color(&t.1, depth - 1, list);
             }
@@ -184,11 +173,7 @@ impl Camera {
     }
 
     fn sample_square() -> Vec3 {
-        Vec3::new(
-            rand::thread_rng().r#gen::<f64>() - 0.5,
-            rand::thread_rng().r#gen::<f64>() - 0.5,
-            0.0,
-        )
+        Vec3::new(random::<f64>() - 0.5, random::<f64>() - 0.5, 0.0)
     }
 
     fn defocus_disk_sample(params: &CameraParams) -> Vec3 {

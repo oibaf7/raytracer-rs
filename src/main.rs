@@ -7,6 +7,7 @@ use raytracer_rs::vector::{Color, Vec3};
 use std::rc::Rc;
 use std::sync::Arc;
 use std::time::Instant;
+use raytracer_rs::bvh::BVHNode;
 
 fn main() {
     render_large_scene();
@@ -15,7 +16,7 @@ fn main() {
 fn render_small_scene() {
     let mat_ground = Arc::new(Lambertian::new(Color::new(0.5, 0.5, 0.5)));
     let mut list = HittableList::new();
-    list.add(Box::new(Sphere::new(
+    list.add(Arc::new(Sphere::new(
         Vec3::new(0.0, -1000.0, 0.0),
         1000.0,
         mat_ground,
@@ -35,7 +36,7 @@ fn render_small_scene() {
                 if choose_mat < 0.8 {
                     let albedo = Vec3::random_unit_vector() * Vec3::random_unit_vector();
                     let sphere_material = Arc::new(Lambertian::new(Color::from_vec(albedo)));
-                    list.add(Box::new(Sphere::new(center, 0.2, sphere_material)));
+                    list.add(Arc::new(Sphere::new(center, 0.2, sphere_material)));
                 } else if choose_mat < 0.95 {
                     let albedo = Color::new(
                         random::<f64>() * 0.5 + 0.5,
@@ -44,10 +45,10 @@ fn render_small_scene() {
                     );
                     let fuzz = random::<f64>() * 0.5 + 0.5;
                     let sphere_material = Arc::new(Metal::new(albedo, fuzz));
-                    list.add(Box::new(Sphere::new(center, 0.2, sphere_material)));
+                    list.add(Arc::new(Sphere::new(center, 0.2, sphere_material)));
                 } else {
                     let sphere_material = Arc::new(Dielectric::new(1.5));
-                    list.add(Box::new(Sphere::new(center, 0.2, sphere_material)));
+                    list.add(Arc::new(Sphere::new(center, 0.2, sphere_material)));
                 }
             }
         }
@@ -55,21 +56,21 @@ fn render_small_scene() {
 
     // 2. Add the three large showcase spheres
     let material1 = Arc::new(Dielectric::new(1.5));
-    list.add(Box::new(Sphere::new(
+    list.add(Arc::new(Sphere::new(
         Vec3::new(0.0, 1.0, 0.0),
         1.0,
         material1,
     )));
 
     let material2 = Arc::new(Lambertian::new(Color::new(0.4, 0.2, 0.1)));
-    list.add(Box::new(Sphere::new(
+    list.add(Arc::new(Sphere::new(
         Vec3::new(-4.0, 1.0, 0.0),
         1.0,
         material2,
     )));
 
     let material3 = Arc::new(Metal::new(Color::new(0.7, 0.6, 0.5), 0.0));
-    list.add(Box::new(Sphere::new(
+    list.add(Arc::new(Sphere::new(
         Vec3::new(4.0, 1.0, 0.0),
         1.0,
         material3,
@@ -85,15 +86,19 @@ fn render_small_scene() {
     camera.vup = Vec3::new(0.0, 1.0, 0.0);
     camera.defocus_angle = 0.6;
     camera.focus_dist = 10.0;
+    let mut world = HittableList::new();
+    let mut objects = list.objects();
+    let len = objects.len();
+    world.add(Arc::new(BVHNode::new(&mut objects, 0, len)));
     let start = Instant::now();
-    camera.render(list);
+    camera.render(world);
     eprintln!("Rendered in {:.2?}", start.elapsed());
 }
 
 fn render_medium_scene() {
     let mat_ground = Arc::new(Lambertian::new(Color::new(0.5, 0.5, 0.5)));
     let mut list = HittableList::new();
-    list.add(Box::new(Sphere::new(
+    list.add(Arc::new(Sphere::new(
         Vec3::new(0.0, -1000.0, 0.0),
         1000.0,
         mat_ground,
@@ -113,7 +118,7 @@ fn render_medium_scene() {
                 if choose_mat < 0.8 {
                     let albedo = Vec3::random_unit_vector() * Vec3::random_unit_vector();
                     let sphere_material = Arc::new(Lambertian::new(Color::from_vec(albedo)));
-                    list.add(Box::new(Sphere::new(center, 0.2, sphere_material)));
+                    list.add(Arc::new(Sphere::new(center, 0.2, sphere_material)));
                 } else if choose_mat < 0.95 {
                     let albedo = Color::new(
                         random::<f64>() * 0.5 + 0.5,
@@ -122,10 +127,10 @@ fn render_medium_scene() {
                     );
                     let fuzz = random::<f64>() * 0.5 + 0.5;
                     let sphere_material = Arc::new(Metal::new(albedo, fuzz));
-                    list.add(Box::new(Sphere::new(center, 0.2, sphere_material)));
+                    list.add(Arc::new(Sphere::new(center, 0.2, sphere_material)));
                 } else {
                     let sphere_material = Arc::new(Dielectric::new(1.5));
-                    list.add(Box::new(Sphere::new(center, 0.2, sphere_material)));
+                    list.add(Arc::new(Sphere::new(center, 0.2, sphere_material)));
                 }
             }
         }
@@ -133,21 +138,21 @@ fn render_medium_scene() {
 
     // 2. Add the three large showcase spheres
     let material1 = Arc::new(Dielectric::new(1.5));
-    list.add(Box::new(Sphere::new(
+    list.add(Arc::new(Sphere::new(
         Vec3::new(0.0, 1.0, 0.0),
         1.0,
         material1,
     )));
 
     let material2 = Arc::new(Lambertian::new(Color::new(0.4, 0.2, 0.1)));
-    list.add(Box::new(Sphere::new(
+    list.add(Arc::new(Sphere::new(
         Vec3::new(-4.0, 1.0, 0.0),
         1.0,
         material2,
     )));
 
     let material3 = Arc::new(Metal::new(Color::new(0.7, 0.6, 0.5), 0.0));
-    list.add(Box::new(Sphere::new(
+    list.add(Arc::new(Sphere::new(
         Vec3::new(4.0, 1.0, 0.0),
         1.0,
         material3,
@@ -163,15 +168,19 @@ fn render_medium_scene() {
     camera.vup = Vec3::new(0.0, 1.0, 0.0);
     camera.defocus_angle = 0.6;
     camera.focus_dist = 10.0;
+    let mut world = HittableList::new();
+    let mut objects = list.objects();
+    let len = objects.len();
+    world.add(Arc::new(BVHNode::new(&mut objects, 0, len)));
     let start = Instant::now();
-    camera.render(list);
+    camera.render(world);
     eprintln!("Rendered in {:.2?}", start.elapsed());
 }
 
 fn render_large_scene() {
     let mat_ground = Arc::new(Lambertian::new(Color::new(0.5, 0.5, 0.5)));
     let mut list = HittableList::new();
-    list.add(Box::new(Sphere::new(
+    list.add(Arc::new(Sphere::new(
         Vec3::new(0.0, -1000.0, 0.0),
         1000.0,
         mat_ground,
@@ -191,7 +200,7 @@ fn render_large_scene() {
                 if choose_mat < 0.8 {
                     let albedo = Vec3::random_unit_vector() * Vec3::random_unit_vector();
                     let sphere_material = Arc::new(Lambertian::new(Color::from_vec(albedo)));
-                    list.add(Box::new(Sphere::new(center, 0.2, sphere_material)));
+                    list.add(Arc::new(Sphere::new(center, 0.2, sphere_material)));
                 } else if choose_mat < 0.95 {
                     let albedo = Color::new(
                         random::<f64>() * 0.5 + 0.5,
@@ -200,10 +209,10 @@ fn render_large_scene() {
                     );
                     let fuzz = random::<f64>() * 0.5 + 0.5;
                     let sphere_material = Arc::new(Metal::new(albedo, fuzz));
-                    list.add(Box::new(Sphere::new(center, 0.2, sphere_material)));
+                    list.add(Arc::new(Sphere::new(center, 0.2, sphere_material)));
                 } else {
                     let sphere_material = Arc::new(Dielectric::new(1.5));
-                    list.add(Box::new(Sphere::new(center, 0.2, sphere_material)));
+                    list.add(Arc::new(Sphere::new(center, 0.2, sphere_material)));
                 }
             }
         }
@@ -211,21 +220,21 @@ fn render_large_scene() {
 
     // 2. Add the three large showcase spheres
     let material1 = Arc::new(Dielectric::new(1.5));
-    list.add(Box::new(Sphere::new(
+    list.add(Arc::new(Sphere::new(
         Vec3::new(0.0, 1.0, 0.0),
         1.0,
         material1,
     )));
 
     let material2 = Arc::new(Lambertian::new(Color::new(0.4, 0.2, 0.1)));
-    list.add(Box::new(Sphere::new(
+    list.add(Arc::new(Sphere::new(
         Vec3::new(-4.0, 1.0, 0.0),
         1.0,
         material2,
     )));
 
     let material3 = Arc::new(Metal::new(Color::new(0.7, 0.6, 0.5), 0.0));
-    list.add(Box::new(Sphere::new(
+    list.add(Arc::new(Sphere::new(
         Vec3::new(4.0, 1.0, 0.0),
         1.0,
         material3,
@@ -241,7 +250,11 @@ fn render_large_scene() {
     camera.vup = Vec3::new(0.0, 1.0, 0.0);
     camera.defocus_angle = 0.6;
     camera.focus_dist = 10.0;
+    let mut world = HittableList::new();
+    let mut objects = list.objects();
+    let len = objects.len();
+    world.add(Arc::new(BVHNode::new(&mut objects, 0, len)));
     let start = Instant::now();
-    camera.render(list);
+    camera.render(world);
     eprintln!("Rendered in {:.2?}", start.elapsed());
 }

@@ -1,3 +1,4 @@
+use crate::aabb::AABB;
 use crate::interval::Interval;
 use crate::material::Material;
 use crate::ray::Ray;
@@ -34,35 +35,44 @@ impl HitRecord {
 }
 
 pub trait Hittable: Send + Sync {
-    fn hit(&self, ray: &Ray, interval: &Interval) -> Option<HitRecord>;
+    fn hit(&self, ray: &Ray, interval: Interval) -> Option<HitRecord>;
+    fn bounding_box(&self) -> AABB;
 }
 
 pub struct HittableList {
-    objects: Vec<Box<dyn Hittable>>,
+    objects: Vec<Arc<dyn Hittable>>,
+    bbox: AABB,
 }
 
 impl HittableList {
     pub fn new() -> Self {
         Self {
             objects: Vec::new(),
+            bbox: AABB::default(),
         }
     }
 
-    pub fn add(&mut self, obj: Box<dyn Hittable>) {
+    pub fn add(&mut self, obj: Arc<dyn Hittable>) {
+        let aabb = obj.bounding_box();
         self.objects.push(obj);
+        self.bbox = AABB::from_boxes(self.bbox, aabb);
     }
 
-    pub fn hit(&self, ray: &Ray, interval: &Interval) -> Option<HitRecord> {
+    pub fn hit(&self, ray: &Ray, interval: Interval) -> Option<HitRecord> {
         let mut result = None;
         let mut closest_so_far = interval.max();
 
         for obj in &self.objects {
-            if let Some(rec) = obj.hit(ray, &Interval::new(interval.min(), closest_so_far)) {
+            if let Some(rec) = obj.hit(ray, Interval::new(interval.min(), closest_so_far)) {
                 closest_so_far = rec.t;
                 result = Some(rec);
             }
         }
 
         result
+    }
+
+    pub fn objects(&mut self) -> &mut [Arc<dyn Hittable>] {
+        &mut self.objects
     }
 }
