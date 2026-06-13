@@ -83,7 +83,7 @@ Three scenes of increasing complexity. Large scene: ~1600 spheres, 1200px wide, 
 
 ```bash
 cargo build --release > output.ppm
-cargo run --release > > output.ppm
+cargo run --release > output.ppm
 ```
 
 ## Citations
