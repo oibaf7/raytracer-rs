@@ -10,7 +10,7 @@ use std::time::Instant;
 use raytracer_rs::bvh::BVHNode;
 
 fn main() {
-    render_large_scene();
+    render_medium_scene();
 }
 
 fn render_small_scene() {

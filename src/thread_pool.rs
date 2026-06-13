@@ -1,13 +1,11 @@
 use crate::camera::{Camera, CameraParams};
 use crate::hittable::HittableList;
 use crate::tiles::{ResultTile, Tile};
-use crate::vector::Vec3;
-use std::f64::consts::PI;
 use std::sync::Arc;
 use std::sync::atomic::{AtomicUsize, Ordering};
 use std::sync::mpsc::Sender;
 use std::thread;
-use std::thread::{JoinHandle, Thread, available_parallelism};
+use std::thread::{JoinHandle, available_parallelism};
 
 type Job = Box<dyn FnOnce() + Send + 'static>;
 
